@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "langgraph-oep"
 version = "0.1.0"
-description = "Capture decision-id-joined evidence from LangGraph agents. Wraps your checkpoint saver to emit OEP tool_permission_packet.v0 records covering the 19 surfaces LangGraph's StateSnapshot does not bind natively."
+description = "Capture decision-id-joined evidence from LangGraph agents. Wraps your checkpoint saver to emit Operational Evidence Plane (OEP) tool_permission_packet.v0 records covering the 19 surfaces LangGraph's StateSnapshot does not bind natively."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "Apache-2.0"

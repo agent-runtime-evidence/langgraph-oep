@@ -7,7 +7,7 @@
 
 `langgraph-oep` records evidence about important LangGraph tool decisions.
 
-Wrap your existing LangGraph checkpointer, mark the state update that represents a permission decision, and the wrapper writes an OEP `tool_permission_packet.v0` JSONL record.
+Wrap your existing LangGraph checkpointer, mark the state update that represents a permission decision, and the wrapper writes an [Operational Evidence Plane (OEP)](https://github.com/agent-runtime-evidence/operational-evidence-plane) `tool_permission_packet.v0` JSONL record.
 
 Use it when you need to answer questions like:
 
