@@ -1,0 +1,92 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        langgraph-version: ["0.2.*", "0.3.*", "1.*"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]" "langgraph==${{ matrix.langgraph-version }}"
+          python -m pip check
+
+      - name: Lint with ruff
+        run: ruff check src/ tests/
+
+      - name: Type check with mypy
+        run: mypy src/
+
+      - name: Test with pytest
+        run: pytest -v --tb=short
+
+      - name: Run examples
+        run: |
+          for example in examples/0*/run.py; do
+            dir="$(dirname "$example")"
+            out="$dir/oep-records.jsonl"
+            rm -f "$out"
+            python "$example"
+            diff -u "$dir/expected_output.jsonl" "$out"
+            rm -f "$out"
+          done
+
+  build:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Build distribution
+        run: |
+          python -m pip install --upgrade pip build
+          python -m build
+      - name: Check distribution
+        run: |
+          pip install twine
+          twine check dist/*
+
+      - name: Smoke install wheel
+        run: |
+          python -m venv /tmp/langgraph-oep-smoke
+          /tmp/langgraph-oep-smoke/bin/python -m pip install --upgrade pip
+          /tmp/langgraph-oep-smoke/bin/python -m pip install dist/*.whl
+          /tmp/langgraph-oep-smoke/bin/python - <<'PY'
+          import importlib.resources as resources
+
+          import langgraph_oep
+          from langgraph_oep import (
+              Actor,
+              DecisionContext,
+              LocalJsonlSink,
+              OEPCheckpointSaver,
+              attach_oep_writer,
+          )
+
+          schema = resources.files("langgraph_oep").joinpath(
+              "schemas/tool_permission_packet.v0.schema.json"
+          )
+          assert langgraph_oep.__version__ == "0.1.0"
+          assert schema.is_file()
+          assert all([Actor, DecisionContext, LocalJsonlSink, OEPCheckpointSaver, attach_oep_writer])
+          PY
