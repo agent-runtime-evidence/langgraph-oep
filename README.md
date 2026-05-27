@@ -1,5 +1,10 @@
 # langgraph-oep
 
+[![PyPI version](https://img.shields.io/pypi/v/langgraph-oep.svg)](https://pypi.org/project/langgraph-oep/)
+[![Python versions](https://img.shields.io/pypi/pyversions/langgraph-oep.svg)](https://pypi.org/project/langgraph-oep/)
+[![CI](https://github.com/agent-runtime-evidence/langgraph-oep/actions/workflows/ci.yml/badge.svg)](https://github.com/agent-runtime-evidence/langgraph-oep/actions/workflows/ci.yml)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 `langgraph-oep` records evidence about important LangGraph tool decisions.
 
 Wrap your existing LangGraph checkpointer, mark the state update that represents a permission decision, and the wrapper writes an OEP `tool_permission_packet.v0` JSONL record.
